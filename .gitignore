@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.*
+!.env.example
+dist/
+build/
+logs/
+*.log
+.DS_Store
+Thumbs.dbdata/tradeflow.db
+data/tradeflow.db.old

@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeFlow SV — Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  --font-display: 'Libre Baskerville', Georgia, serif;
+
+  --ink: #111111;
+  --ink2: #333333;
+  --ink3: #777777;
+  --ink4: #999999;
+  --ink5: #cccccc;
+
+  --bg: #f2f2f2;
+  --bg2: #f7f7f7;
+  --white: #ffffff;
+  --rule: #e0e0e0;
+  --rule2: #cccccc;
+
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --red-mid: #b91c1c;
+  --red-border: #fecaca;
+
+  --amber: #d97706;
+  --amber-light: #fffbeb;
+  --amber-border: #fde68a;
+
+  --green: #16a34a;
+  --green-light: #f0fdf4;
+  --green-border: #bbf7d0;
+
+  --blue: #2563eb;
+  --blue-light: #eff6ff;
+  --blue-border: #bfdbfe;
+
+  --radius: 6px;
+  --radius-lg: 10px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+  --shadow: 0 1px 3px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--ink); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+
+.topbar {
+  background: var(--ink);
+  color: var(--ink4);
+  padding: 0 24px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: .2px;
+}
+.topbar-left, .topbar-right { display: flex; align-items: center; gap: 14px; }
+.logo {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -.3px;
+}
+.logo-accent { color: var(--green); }
+.logo sup { font-size: 8px; color: var(--ink4); font-weight: 400; margin-left: 1px; }
+.topbar-divider { width: 1px; height: 14px; background: rgba(255,255,255,.12); }
+.topbar-company { color: rgba(255,255,255,.7); font-weight: 600; }
+.topbar-ior { color: var(--ink4); font-family: var(--font-mono); font-size: 10px; }
+.topbar-ior span { color: rgba(255,255,255,.5); }
+.topbar-status { display: flex; align-items: center; gap: 10px; font-size: 10px; color: var(--ink4); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 3px; }
+.status-dot.green { background: var(--green); box-shadow: 0 0 4px rgba(22,163,74,.4); }
+.topbar-link { color: var(--ink4); text-decoration: none; font-size: 11px; transition: color .15s; }
+.topbar-link:hover { color: #fff; }
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--white);
+  border-bottom: 1px solid var(--rule);
+  box-shadow: var(--shadow-sm);
+}
+.navbar-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+}
+.nav-tabs { display: flex; align-items: stretch; height: 100%; gap: 2px; overflow-x: auto; }
+.nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 16px;
+  height: 100%;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all .15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-tab svg { opacity: .5; transition: opacity .15s; flex-shrink: 0; }
+.nav-tab:hover { color: var(--ink); background: var(--bg); }
+.nav-tab:hover svg { opacity: .8; }
+.nav-tab.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+.nav-tab.active svg { opacity: 1; }
+
+.btn-nuevo {
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all .15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-nuevo:hover { background: var(--ink2); transform: translateY(-1px); box-shadow: var(--shadow); }
+
+.page { display: none; }
+.page.active { display: block; }
+.page-wrap { max-width: 1280px; margin: 0 auto; padding: 28px 24px; }
+
+.masthead { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 16px; border-bottom: 1px solid var(--rule); flex-wrap: wrap; gap: 12px; }
+.masthead-kicker { font-size: 11px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--ink3); margin-bottom: 4px; }
+.masthead-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--ink); letter-spacing: -.3px; }
+.masthead-source { font-size: 12px; color: var(--ink4); margin-top: 4px; font-family: var(--font-mono); font-size: 11px; }
+
+.btn-primary {
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all .15s;
+  white-space: nowrap;
+}
+.btn-primary:hover { background: var(--ink2); }
+.btn-primary:disabled { opacity: .4; pointer-events: none; }
+.btn-cancel {
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 8px 18px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink3);
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-cancel:hover { border-color: var(--ink); color: var(--ink); }
+
+.kpi-strip {
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.kpi-cell { background: var(--white); padding: 16px 18px; }
+.kpi-label { font-size: 11px; font-weight: 500; color: var(--ink3); margin-bottom: 6px; letter-spacing: .3px; }
+.kpi-value { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--ink); line-height: 1; }
+.kpi-note { font-size: 10px; color: var(--ink4); margin-top: 6px; font-family: var(--font-mono); }
+
+.grid-2     { display: grid; grid-template-columns: 1fr 1fr;     gap: 16px; margin-bottom: 16px; }
+.grid-3     { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.grid-col-2 { display: grid; grid-template-columns: 2fr 1fr;     gap: 16px; margin-bottom: 16px; }
+
+.panel {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+.panel-header {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg);
+}
+.panel-title { font-size: 12px; font-weight: 600; color: var(--ink2); letter-spacing: .2px; }
+.panel-meta { font-size: 10px; color: var(--ink4); font-family: var(--font-mono); }
+.panel-body { padding: 18px; }
+
+.card { background: var(--white); border: 1px solid var(--rule); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.card-head { padding: 12px 18px; border-bottom: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: center; background: var(--bg); }
+.card-title { font-size: 12px; font-weight: 600; color: var(--ink2); }
+.card-meta { font-size: 10px; color: var(--ink4); font-family: var(--font-mono); }
+.card-body { padding: 18px; }
+
+.tag { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap; border: 1px solid; font-family: var(--font-mono); letter-spacing: .2px; }
+.tag.red    { background: var(--red-light); color: var(--red-mid); border-color: var(--red-border); }
+.tag.amber  { background: var(--amber-light); color: #92400e; border-color: var(--amber-border); }
+.tag.green  { background: var(--green-light); color: #166534; border-color: var(--green-border); }
+.tag.blue   { background: var(--blue-light); color: #1e40af; border-color: var(--blue-border); }
+.tag.neutral{ background: var(--bg2); color: var(--ink3); border-color: var(--rule); }
+
+.notice { padding: 12px 16px; border-radius: var(--radius); font-size: 13px; line-height: 1.5; margin-bottom: 16px; border: 1px solid; border-left-width: 3px; }
+.notice.warn   { background: var(--amber-light); border-color: var(--amber-border); border-left-color: var(--amber); color: #92400e; }
+.notice.danger { background: var(--red-light); border-color: var(--red-border); border-left-color: var(--red); color: var(--red-mid); }
+.notice.ok     { background: var(--green-light); border-color: var(--green-border); border-left-color: var(--green); color: #166534; }
+.notice.info   { background: var(--blue-light); border-color: var(--blue-border); border-left-color: var(--blue); color: #1e40af; }
+.notice strong { font-weight: 700; color: var(--ink); }
+.notice a { color: var(--ink); font-weight: 600; }
+
+/* ══════════════════════════════════════
+   DATA TABLES
+══════════════════════════════════════ */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table thead th { background: var(--bg); border-bottom: 1px solid var(--rule); padding: 10px 16px; font-size: 11px; font-weight: 600; color: var(--ink3); text-align: left; letter-spacing: .3px; text-transform: uppercase; }
+.data-table tbody tr { border-bottom: 1px solid var(--rule); transition: background .1s; }
+.data-table tbody tr:last-child { border-bottom: none; }
+.data-table tbody tr:hover { background: var(--bg); }
+.data-table td { padding: 12px 16px; vertical-align: top; }
+
+.search-row { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+.search-input { flex: 1; min-width: 200px; background: var(--white); border: 1px solid var(--rule); border-radius: var(--radius); padding: 9px 14px; font-family: var(--font-body); font-size: 13px; color: var(--ink); outline: none; transition: all .15s; }
+.search-input:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(15,23,42,.06); }
+.search-input::placeholder { color: var(--ink4); }
+.filter-tab { background: var(--white); border: 1px solid var(--rule); border-radius: var(--radius); padding: 8px 16px; font-family: var(--font-body); font-size: 12px; font-weight: 500; color: var(--ink3); cursor: pointer; transition: all .15s; white-space: nowrap; }
+.filter-tab:hover { color: var(--ink); border-color: var(--ink4); }
+.filter-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.count-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px; color: var(--ink3); flex-wrap: wrap; gap: 6px; }
+.count-row a { color: var(--ink); font-weight: 600; text-decoration: none; }
+
+.hbar-list { display: flex; flex-direction: column; gap: 8px; }
+.hbar { display: flex; align-items: center; gap: 10px; }
+.hbar-label { width: 120px; font-size: 12px; color: var(--ink2); text-align: right; flex-shrink: 0; font-family: var(--font-mono); font-size: 11px; }
+.hbar-track { flex: 1; height: 24px; background: var(--bg2); border-radius: 4px; overflow: hidden; border: 1px solid var(--rule); }
+.hbar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; transition: width 1s ease; width: 0%; color: #fff; }
+.hbar-fill.red   { background: var(--red); }
+.hbar-fill.amber { background: var(--amber); }
+.hbar-fill.blue  { background: var(--blue); }
+.hbar-fill.gray  { background: var(--ink3); }
+
+.col-chart { display: flex; align-items: flex-end; gap: 5px; height: 90px; }
+.col-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; height: 100%; }
+.col-fill { width: 100%; border-radius: 4px 4px 0 0; position: relative; min-height: 3px; background: var(--ink5); transition: height 1s ease; }
+.col-fill.current { background: var(--red); }
+.col-num { position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-family: var(--font-mono); font-size: 9px; color: var(--ink2); white-space: nowrap; font-weight: 600; }
+.col-label { font-size: 10px; color: var(--ink4); font-family: var(--font-mono); }
+
+.sub-tabs { display: flex; border-bottom: 1px solid var(--rule); overflow-x: auto; margin-bottom: 4px; }
+.sub-tab { padding: 10px 18px; border: none; background: none; font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--ink3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; white-space: nowrap; flex-shrink: 0; }
+.sub-tab:hover { color: var(--ink); }
+.sub-tab.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+.sub-pane { display: none; padding-top: 20px; }
+.sub-pane.active { display: block; }
+
+.shipment-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--rule); cursor: pointer; transition: all .15s; }
+.shipment-row:last-child { border-bottom: none; }
+.shipment-row:hover { background: var(--bg); margin: 0 -18px; padding: 12px 18px; border-radius: var(--radius); }
+.sr-status-bar { width: 3px; height: 36px; border-radius: 2px; flex-shrink: 0; }
+.sr-info { flex: 1; min-width: 0; }
+.sr-entry { font-family: var(--font-mono); font-size: 10px; color: var(--ink4); }
+.sr-company { font-size: 13px; font-weight: 600; color: var(--ink); }
+.sr-product { font-size: 11px; color: var(--ink3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sr-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+
+.info-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 16px; }
+.info-cell { background: var(--white); border: 1px solid var(--rule); border-radius: var(--radius); padding: 12px 14px; }
+.ic-label { font-size: 10px; font-weight: 600; color: var(--ink3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .3px; }
+.ic-value { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--ink); }
+
+.alert-card { background: var(--white); border: 1px solid var(--rule); border-radius: var(--radius-lg); margin-bottom: 10px; box-shadow: var(--shadow-sm); }
+.alert-card-head { padding: 12px 18px; background: var(--bg); border-bottom: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.alert-num { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--ink); }
+.alert-card-body { padding: 16px 18px; }
+.alert-title { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.4; margin-bottom: 8px; }
+.alert-meta-row { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 10px; font-size: 12px; color: var(--ink3); }
+.alert-meta-row strong { color: var(--ink2); font-weight: 600; }
+.alert-reason { background: var(--red-light); border: 1px solid var(--red-border); border-radius: var(--radius); padding: 10px 14px; font-size: 12px; color: var(--ink2); }
+.alert-reason strong { color: var(--red-mid); font-weight: 600; }
+
+.alert-banner { background: var(--red-light); border: 1px solid var(--red-border); border-left: 4px solid var(--red); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.ab-title { font-size: 13px; font-weight: 700; color: var(--red-mid); margin-bottom: 2px; }
+.ab-text { font-size: 12px; color: var(--ink2); line-height: 1.5; }
+.ab-action { font-family: var(--font-mono); font-size: 11px; color: var(--ink); border: 1px solid var(--rule); border-radius: var(--radius); padding: 6px 14px; text-decoration: none; white-space: nowrap; flex-shrink: 0; background: var(--white); transition: all .15s; }
+.ab-action:hover { border-color: var(--ink); }
+
+.ok-banner { background: var(--green-light); border: 1px solid var(--green-border); border-left: 4px solid var(--green); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px; font-size: 12px; color: var(--ink2); }
+.ok-banner strong { color: #15803d; font-weight: 700; }
+
+.fda-hold-panel { background: var(--red-light); border: 1px solid var(--red-border); border-left: 4px solid var(--red); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 16px; }
+.fhp-title { font-size: 12px; font-weight: 700; color: var(--red-mid); margin-bottom: 3px; text-transform: uppercase; letter-spacing: .4px; }
+.fhp-sub { font-size: 11px; color: var(--ink2); margin-bottom: 12px; }
+
+.my-dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+
+.cost-summary-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 13px; }
+.cost-summary-row:last-child { border-bottom: none; }
+.csr-label { color: var(--ink2); }
+.csr-value { font-family: var(--font-mono); font-weight: 600; }
+
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); padding: 16px; }
+.overlay.open { display: flex; }
+.modal { background: var(--white); border-radius: var(--radius-lg); width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(15,23,42,.2); border: 1px solid var(--rule); }
+.modal-head { padding: 20px 24px; border-bottom: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: flex-start; }
+.modal-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--ink); }
+.modal-sub { font-size: 12px; color: var(--ink3); margin-top: 3px; }
+.modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ink4); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius); transition: all .15s; }
+.modal-close:hover { color: var(--ink); background: var(--bg2); }
+.modal-body { padding: 24px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--rule); display: flex; gap: 8px; justify-content: flex-end; background: var(--bg); margin: 0 -24px -24px; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: .3px; text-transform: uppercase; color: var(--ink3); margin-bottom: 6px; }
+.form-input { width: 100%; background: var(--bg); border: 1px solid var(--rule); border-radius: var(--radius); padding: 9px 13px; font-family: var(--font-body); font-size: 13px; color: var(--ink); outline: none; transition: all .15s; }
+.form-input:focus { border-color: var(--ink); background: var(--white); box-shadow: 0 0 0 3px rgba(15,23,42,.06); }
+.form-input::placeholder { color: var(--ink4); }
+.form-input:disabled { opacity: .5; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-hint { font-size: 11px; color: var(--ink4); margin-top: 4px; font-family: var(--font-mono); }
+
+.loading { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 48px; color: var(--ink3); font-size: 13px; }
+.spinner { width: 18px; height: 18px; border: 2px solid var(--rule); border-top-color: var(--ink); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--ink); color: #fff; padding: 12px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 600; z-index: 2000; transform: translateY(50px); opacity: 0; transition: all .25s; box-shadow: var(--shadow-md); }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.ok  { background: #15803d; }
+.toast.err { background: var(--red); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeUp .25s ease forwards; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--ink5); border-radius: 3px; }
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  flex-shrink: 0;
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--ink);
+  margin: 4px 0;
+  border-radius: 1px;
+  transition: all .2s;
+}
+.mobile-nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 999;
+  backdrop-filter: blur(2px);
+}
+.mobile-nav-overlay.open { display: block; }
+.mobile-nav {
+  position: fixed;
+  top: 0;
+  right: -280px;
+  width: 280px;
+  height: 100%;
+  background: var(--white);
+  z-index: 1000;
+  box-shadow: -4px 0 20px rgba(0,0,0,.15);
+  transition: right .25s ease;
+  display: flex;
+  flex-direction: column;
+}
+.mobile-nav.open { right: 0; }
+.mobile-nav-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mobile-nav-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--ink3);
+  padding: 4px;
+}
+.mobile-nav-links {
+  flex: 1;
+  padding: 12px 0;
+  overflow-y: auto;
+}
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink2);
+  text-decoration: none;
+  border: none;
+  background: none;
+  width: 100%;
+  cursor: pointer;
+  transition: background .1s;
+  text-align: left;
+}
+.mobile-nav-link:hover { background: var(--bg2); }
+.mobile-nav-link.active { color: var(--ink); font-weight: 700; background: var(--bg); border-left: 3px solid var(--ink); }
+.mobile-nav-link svg { opacity: .5; flex-shrink: 0; }
+.mobile-nav-link.active svg { opacity: 1; }
+.mobile-nav-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mobile-nav-footer a {
+  font-size: 12px;
+  color: var(--ink3);
+  text-decoration: none;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-scroll .data-table {
+  min-width: 600px;
+}
+
+.shipment-card-mobile { display: none; }
+
+.ship-card {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.ship-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg);
+  gap: 8px;
+}
+.ship-card-entry { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--ink); }
+.ship-card-bl { font-family: var(--font-mono); font-size: 10px; color: var(--ink4); margin-top: 1px; }
+.ship-card-body { padding: 14px 16px; }
+.ship-card-product { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 12px; line-height: 1.4; }
+.ship-card-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--bg2); font-size: 13px; }
+.ship-card-row:last-child { border-bottom: none; }
+.ship-card-label { color: var(--ink3); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .3px; }
+.ship-card-val { color: var(--ink); font-family: var(--font-mono); font-size: 12px; font-weight: 500; text-align: right; max-width: 60%; word-break: break-word; }
+.ship-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-top: 1px solid var(--rule);
+}
+.ship-card-actions { display: flex; gap: 8px; align-items: center; }
+.btn-ver { background: var(--ink); color: #fff; border: none; border-radius: var(--radius); padding: 7px 16px; font-family: var(--font-body); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; }
+.btn-ver:hover { background: var(--ink2); }
+.btn-del { background: none; border: 1px solid var(--red-border); border-radius: var(--radius); padding: 6px 10px; font-size: 14px; cursor: pointer; color: var(--red); transition: all .15s; }
+.btn-del:hover { background: var(--red-light); }
+
+@media (max-width: 768px) {
+  .topbar { padding: 0 14px; height: 32px; }
+  .topbar-status, .topbar-ior, .topbar-divider:not(:first-of-type) { display: none; }
+
+  .navbar-inner { padding: 0 14px; height: 48px; }
+  .nav-tabs { display: none; }
+  .hamburger { display: block; }
+  .btn-nuevo { padding: 6px 12px; font-size: 12px; }
+
+  .page-wrap { padding: 20px 14px; }
+
+  .masthead { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .masthead-title { font-size: 18px; }
+
+  .kpi-strip { grid-template-columns: repeat(2,1fr) !important; }
+  .kpi-value { font-size: 22px; }
+
+  .grid-2, .grid-3, .grid-col-2 { grid-template-columns: 1fr; }
+  .info-grid { grid-template-columns: repeat(2,1fr); }
+
+  .shipment-table-desktop { display: none !important; }
+  .shipment-card-mobile { display: block !important; }
+
+  .data-table { font-size: 12px; }
+  .data-table thead th { padding: 8px 12px; font-size: 10px; }
+  .data-table td { padding: 10px 12px; }
+
+  .form-row { grid-template-columns: 1fr; }
+  .modal { max-height: 95vh; }
+  .modal-body { padding: 16px; }
+  .modal-head { padding: 16px; }
+
+  .toast { bottom: 14px; right: 14px; left: 14px; }
+
+  .hbar-label { width: 90px; font-size: 10px; }
+  .my-dash-grid.two { grid-template-columns: 1fr; }
+
+  .search-row { flex-direction: column; align-items: stretch; }
+  .search-input { min-width: unset; }
+}
+
+@media (max-width: 480px) {
+  .topbar { height: 28px; font-size: 10px; }
+  .topbar-company { font-size: 10px; }
+
+  .navbar-inner { height: 44px; }
+  .nav-tab { padding: 0 8px; font-size: 11px; }
+  .btn-nuevo { padding: 5px 10px; font-size: 11px; }
+
+  .kpi-cell { padding: 12px 14px; }
+  .kpi-value { font-size: 20px; }
+  .kpi-label { font-size: 10px; }
+
+  .masthead-title { font-size: 16px; }
+  .page-wrap { padding: 16px 12px; }
+
+  .filter-tab { flex: 1; text-align: center; padding: 8px 10px; }
+}
+
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.shipment-table-desktop{display:block;}
+.shipment-card-mobile{display:none;}
+.ship-card{background:var(--white);border:1px solid var(--rule);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:10px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow-sm);}
+.ship-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
+.ship-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.ship-card-entry{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--ink);}
+.ship-card-bl{font-family:var(--font-mono);font-size:10px;color:var(--ink4);}
+.ship-card-body{border-top:1px solid var(--rule);padding-top:10px;}
+.ship-card-product{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px;}
+.ship-card-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;}
+.ship-card-label{color:var(--ink3);}
+.ship-card-val{color:var(--ink);font-family:var(--font-mono);font-size:11px;}
+.ship-card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--rule);}
+.ship-card-actions{display:flex;gap:6px;}
+.btn-ver{background:var(--ink);color:#fff;border:none;border-radius:var(--radius);padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);}
+.btn-del{background:none;border:none;cursor:pointer;color:var(--red);font-size:18px;padding:2px 6px;}
+.my-dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
+.my-dash-grid.two{grid-template-columns:2fr 1fr;}
+.alert-banner{background:var(--red-light);border:1px solid var(--red-border);border-left:4px solid var(--red);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+.ab-title{font-size:13px;font-weight:700;color:var(--red-mid);margin-bottom:2px;}
+.ab-text{font-size:12px;color:var(--ink2);line-height:1.5;}
+.ab-action{font-family:var(--font-mono);font-size:11px;color:var(--ink);border:1px solid var(--rule);border-radius:var(--radius);padding:6px 14px;text-decoration:none;white-space:nowrap;flex-shrink:0;background:var(--white);transition:all .15s;}
+.ab-action:hover{border-color:var(--ink);}
+.ok-banner{background:var(--green-light);border:1px solid var(--green-border);border-left:4px solid var(--green);border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;font-size:12px;color:var(--ink2);}
+.ok-banner strong{color:#15803d;font-weight:700;}
+.fda-hold-panel{background:var(--red-light);border:1px solid var(--red-border);border-left:4px solid var(--red);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px;}
+.fhp-title{font-size:12px;font-weight:700;color:var(--red-mid);margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px;}
+.fhp-sub{font-size:11px;color:var(--ink2);margin-bottom:12px;}
+.cost-summary-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--rule);font-size:13px;}
+.cost-summary-row:last-child{border-bottom:none;}
+.csr-label{color:var(--ink2);}
+.csr-value{font-family:var(--font-mono);font-weight:600;}
+.info-cell{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:12px 14px;}
+.ic-label{font-size:10px;font-weight:600;color:var(--ink3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px;}
+.ic-value{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--ink);}
+.mobile-nav-link{display:flex;align-items:center;gap:12px;width:100%;padding:14px 20px;border:none;background:none;font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--ink2);cursor:pointer;text-align:left;transition:all .15s;border-left:3px solid transparent;}
+.mobile-nav-link:hover{background:var(--bg);color:var(--ink);}
+.mobile-nav-link.active{color:var(--ink);background:var(--bg);border-left-color:var(--ink);font-weight:600;}
+.mobile-nav-footer{padding:16px 20px;border-top:1px solid var(--rule);display:flex;flex-direction:column;gap:10px;}
+.mobile-nav-footer a{color:var(--ink3);text-decoration:none;font-size:13px;}
+@media(max-width:768px){
+  .shipment-table-desktop{display:none!important;}
+  .shipment-card-mobile{display:block;}
+  .my-dash-grid.two{grid-template-columns:1fr;}
+}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo">Trade<span class="logo-accent">Flow</span><sup>SV</sup></div>
+    <div class="topbar-divider"></div>
+    <div class="topbar-company" id="ub-company">&mdash;</div>
+    <div class="topbar-ior">IOR: <span id="ub-ior">&mdash;</span></div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-status">
+      <span class="status-dot green"></span>CBP ACE
+      <span class="status-dot green"></span>FDA OASIS
+    </div>
+    <div class="topbar-divider"></div>
+    <a href="#" onclick="showPage('perfil')" class="topbar-link">Mi perfil</a>
+    <a href="index.html" onclick="doLogout()" class="topbar-link">Salir</a>
+    <div id="ub-role-badge"></div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-page="mi-dashboard" onclick="showPage('mi-dashboard')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-tab" data-page="mis-envios" onclick="showPage('mis-envios')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        Mis Envios
+      </button>
+      <button class="nav-tab" data-page="mi-fda" onclick="showPage('mi-fda')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+        Historial FDA
+      </button>
+      <button class="nav-tab" data-page="inteligencia" onclick="showPage('inteligencia')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        Inteligencia
+      </button>
+      <button class="nav-tab" data-page="referencia" onclick="showPage('referencia')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        Referencia
+      </button>
+    </div>
+    <button class="btn-nuevo" onclick="openModal('modal-add')">+ Nuevo Envio</button>
+    <button class="hamburger" onclick="toggleMobileNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE NAV DRAWER -->
+<div class="mobile-nav-overlay" id="mobile-nav-overlay" onclick="closeMobileNav()"></div>
+<div class="mobile-nav" id="mobile-nav">
+  <div class="mobile-nav-header">
+    <div class="logo">Trade<span class="logo-accent">Flow</span><sup>SV</sup></div>
+    <button class="mobile-nav-close" onclick="closeMobileNav()">&times;</button>
+  </div>
+  <div class="mobile-nav-links">
+    <button class="mobile-nav-link active" data-page="mi-dashboard" onclick="mobileShowPage('mi-dashboard')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </button>
+    <button class="mobile-nav-link" data-page="mis-envios" onclick="mobileShowPage('mis-envios')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      Mis Envios
+    </button>
+    <button class="mobile-nav-link" data-page="mi-fda" onclick="mobileShowPage('mi-fda')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+      Historial FDA
+    </button>
+    <button class="mobile-nav-link" data-page="inteligencia" onclick="mobileShowPage('inteligencia')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+      Inteligencia
+    </button>
+    <button class="mobile-nav-link" data-page="referencia" onclick="mobileShowPage('referencia')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      Referencia
+    </button>
+  </div>
+  <div class="mobile-nav-footer">
+    <a href="#" onclick="mobileShowPage('perfil')">Mi perfil</a>
+    <a href="index.html" onclick="doLogout()">Cerrar sesion</a>
+  </div>
+</div>
+
+<!-- PAGES -->
+<div class="page active" id="page-mi-dashboard">
+  <div class="page-wrap">
+    <div class="masthead">
+      <div>
+        <div class="masthead-kicker">Panel de Control</div>
+        <div class="masthead-title" id="dash-company-title">Mi Dashboard</div>
+        <div class="masthead-source" id="dash-date">Cargando...</div>
+      </div>
+      <button class="btn-primary" onclick="openModal('modal-add')">+ Registrar Envio</button>
+    </div>
+    <div id="mi-dash-content"><div class="loading"><div class="spinner"></div>Cargando su panel...</div></div>
+  </div>
+</div>
+
+<div class="page" id="page-mis-envios">
+  <div class="page-wrap">
+    <div class="masthead">
+      <div>
+        <div class="masthead-kicker">Seguimiento de Embarques</div>
+        <div class="masthead-title">Mis Envios</div>
+        <div class="masthead-source" id="mis-sub">Cargando...</div>
+      </div>
+      <button class="btn-primary" onclick="openModal('modal-add')">Registrar Envio</button>
+    </div>
+    <div id="mis-content"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+  </div>
+</div>
+
+<div class="page" id="page-mi-fda">
+  <div class="page-wrap">
+    <div class="masthead">
+      <div>
+        <div class="masthead-kicker">Historial Regulatorio</div>
+        <div class="masthead-title">Mi Historial FDA</div>
+        <div class="masthead-source">Rechazos e Import Alerts vinculados a su empresa &mdash; FDA Dashboard API</div>
+      </div>
+    </div>
+    <div id="mi-fda-content"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+  </div>
+</div>
+
+<div class="page" id="page-inteligencia">
+  <div class="page-wrap">
+    <div class="masthead">
+      <div>
+        <div class="masthead-kicker">Contexto de Industria</div>
+        <div class="masthead-title">Inteligencia de Mercado &mdash; El Salvador</div>
+        <div class="masthead-source">api-datadashboard.fda.gov &middot; FDA import_refusals API</div>
+      </div>
+    </div>
+    <div class="sub-tabs">
+      <button class="sub-tab active" data-sub="intel-dash" onclick="showSub('intel-dash',this)">Dashboard FDA</button>
+      <button class="sub-tab" data-sub="intel-rechazos" onclick="showSub('intel-rechazos',this)">Rechazos SV</button>
+      <button class="sub-tab" data-sub="intel-alerts" onclick="showSub('intel-alerts',this)">Import Alerts</button>
+    </div>
+    <div class="sub-pane active" id="sub-intel-dash">
+      <div id="dash-content"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+    </div>
+    <div class="sub-pane" id="sub-intel-rechazos">
+      <div class="search-row" style="margin-top:16px">
+        <input class="search-input" id="rf-search" placeholder="Buscar por empresa, producto o cargo de refusal..." oninput="filterRefusals()">
+        <button class="filter-tab active" onclick="setRfFilter(this,'all')">Todos</button>
+        <button class="filter-tab" onclick="setRfFilter(this,'food')">Alimentos</button>
+        <button class="filter-tab" onclick="setRfFilter(this,'drug')">Medicamentos</button>
+        <button class="filter-tab" onclick="setRfFilter(this,'cosm')">Cosmeticos</button>
+      </div>
+      <div class="count-row">
+        <span>Fuente: <span id="rf-source">FDA API</span> &middot; <span id="rf-count">&mdash;</span> registros</span>
+        <a href="https://datadashboard.fda.gov/oii/cd/imprefusals.htm" target="_blank">Ver en FDA.gov</a>
+      </div>
+      <div class="panel table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Shipment ID</th><th>Empresa</th><th>Categoria</th><th>Producto</th><th>Cargos de Refusal</th><th>Fecha</th></tr></thead>
+          <tbody id="rf-tbody"><tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="sub-pane" id="sub-intel-alerts">
+      <div id="alerts-content" style="margin-top:16px"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-referencia">
+  <div class="page-wrap">
+    <div class="masthead">
+      <div>
+        <div class="masthead-kicker">Consulta Tecnica</div>
+        <div class="masthead-title">Codigos de Refusal &rarr; eCFR Title 21</div>
+        <div class="masthead-source">ACT_SECTION_CHARGES.CSV &middot; 160+ codigos &middot; Enlace directo a ecfr.gov</div>
+      </div>
+    </div>
+    <div class="search-row">
+      <input class="search-input" id="cd-search" placeholder="Buscar por codigo, seccion legal o descripcion..." oninput="filterCodes()">
+      <button class="filter-tab active" onclick="setCodeFilter(this,'all')">Todos</button>
+      <button class="filter-tab" onclick="setCodeFilter(this,'ADULTERATION')">Adulteracion</button>
+      <button class="filter-tab" onclick="setCodeFilter(this,'MISBRANDING')">Misbranding</button>
+    </div>
+    <div class="count-row">
+      <span>Mostrando <span id="cd-count">&mdash;</span> codigos</span>
+      <a href="https://www.ecfr.gov/current/title-21" target="_blank">Ver eCFR Title 21 completo &rarr;</a>
+    </div>
+    <div class="panel table-scroll">
+      <table class="data-table">
+        <thead><tr><th>Codigo</th><th>Seccion Legal</th><th>Categoria</th><th>Descripcion</th><th>CFR</th></tr></thead>
+        <tbody id="cd-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-perfil">
+  <div class="page-wrap">
+    <div class="masthead">
+      <div>
+        <div class="masthead-kicker">Cuenta</div>
+        <div class="masthead-title">Mi Perfil</div>
+      </div>
+    </div>
+    <div id="perfil-content"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+  </div>
+</div>
+
+<!-- MODAL NUEVO ENVIO -->
+<div class="overlay" id="modal-add">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">Registrar Nuevo Envio</div>
+        <div class="modal-sub">Ingrese el numero de contenedor — el sistema completara los datos automaticamente</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-add')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form onsubmit="submitShipment(event)">
+        <div class="form-group">
+          <label class="form-label">Numero de Contenedor *</label>
+          <input class="form-input" id="s-container" placeholder="MSCU7284013" required style="font-size:16px;font-weight:600;font-family:var(--font-mono);letter-spacing:1px" oninput="detectContainerCarrier(this.value)">
+          <div class="form-hint" id="s-carrier-hint" style="display:none"></div>
+        </div>
+        <div id="autofill-info" style="display:none;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius);padding:12px;margin-bottom:14px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:8px">Datos detectados</div>
+          <div id="autofill-content" style="font-size:12px;color:var(--ink2);font-family:var(--font-mono)"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Entry Number</label><input class="form-input" id="s-entry" placeholder="EL-2025-000000 (opcional)"></div>
+          <div class="form-group"><label class="form-label">Bill of Lading</label><input class="form-input" id="s-bl" placeholder="MSCUSV000000 (opcional)"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Producto</label><input class="form-input" id="s-product" placeholder="Camarones congelados — 2,400 kg (opcional)"></div>
+        <div style="display:none">
+          <input class="form-input" id="s-vessel">
+          <input class="form-input" id="s-origin">
+          <input class="form-input" id="s-dest">
+          <input type="date" class="form-input" id="s-etd">
+          <input type="date" class="form-input" id="s-eta">
+          <input class="form-input" id="s-broker">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" onclick="closeModal('modal-add')">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btn-add-ship">Registrar y Rastrear</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<script src="app-api.js"></script>
+<script src="app-ui.js"></script>
+</body>
+</html>

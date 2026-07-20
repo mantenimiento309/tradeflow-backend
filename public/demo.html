@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeFlow SV — Consulta pública FDA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-display: 'Libre Baskerville', Georgia, serif;
+  --ink: #111; --ink2: #333; --ink3: #666; --ink4: #999;
+  --bg: #f2f2f2; --white: #fff; --rule: #e3e3e3;
+  --blue: #2563eb; --red: #c0392b; --red-light: #fdf0ee; --amber: #b8860b;
+  --radius: 8px; --radius-lg: 14px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--ink); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+
+.topbar { background: var(--ink); color: #fff; height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+.logo { font-weight: 700; font-size: 16px; }
+.logo sup { font-size: 9px; color: var(--ink4); }
+.logo .accent { color: #4ade80; }
+.top-actions { display: flex; gap: 18px; align-items: center; }
+.top-actions a { color: #ccc; text-decoration: none; font-size: 13px; }
+.top-actions a:hover { color: #fff; }
+.top-actions a.cta { background: #fff; color: var(--ink); padding: 7px 16px; border-radius: var(--radius); font-weight: 600; }
+
+.hero { max-width: 880px; margin: 0 auto; padding: 56px 24px 24px; text-align: center; }
+.hero-kicker { font-family: var(--font-mono); font-size: 12px; color: var(--ink3); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
+.hero-title { font-family: var(--font-display); font-size: 38px; line-height: 1.2; margin-bottom: 14px; }
+.hero-sub { font-size: 16px; color: var(--ink3); max-width: 560px; margin: 0 auto 32px; }
+
+.search-box { display: flex; gap: 10px; max-width: 620px; margin: 0 auto; }
+.search-box input {
+  flex: 1; padding: 16px 18px; font-size: 15px; border: 1.5px solid var(--rule);
+  border-radius: var(--radius); font-family: var(--font-body); background: #fff;
+}
+.search-box input:focus { outline: none; border-color: var(--ink); }
+.search-box button {
+  padding: 16px 28px; background: var(--ink); color: #fff; border: none;
+  border-radius: var(--radius); font-size: 15px; font-weight: 600; cursor: pointer; font-family: var(--font-body);
+}
+.search-box button:hover { background: var(--ink2); }
+.search-hint { font-size: 12px; color: var(--ink4); margin-top: 12px; }
+
+.stats { display: flex; justify-content: center; gap: 40px; margin: 28px 0; flex-wrap: wrap; }
+.stat-num { font-family: var(--font-display); font-size: 26px; font-weight: 700; }
+.stat-label { font-size: 11px; color: var(--ink3); text-transform: uppercase; letter-spacing: .8px; }
+
+.results { max-width: 980px; margin: 0 auto; padding: 0 24px 60px; }
+.results-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 13px; color: var(--ink3); }
+.result-card { background: #fff; border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 10px; }
+.rc-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+.rc-firm { font-weight: 600; font-size: 15px; }
+.rc-date { font-family: var(--font-mono); font-size: 12px; color: var(--ink4); white-space: nowrap; }
+.rc-product { font-size: 13px; color: var(--ink2); margin-bottom: 8px; }
+.rc-charges { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-family: var(--font-mono); font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+.tag.red { background: var(--red-light); color: var(--red); }
+.rc-meta { margin-top: 8px; font-size: 11px; color: var(--ink4); font-family: var(--font-mono); }
+
+.empty { text-align: center; padding: 48px 24px; color: var(--ink4); }
+.spinner { width: 22px; height: 22px; border: 3px solid var(--rule); border-top-color: var(--ink); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.gate { background: var(--ink); color: #fff; border-radius: var(--radius-lg); padding: 28px; text-align: center; margin: 24px auto; max-width: 560px; }
+.gate-title { font-family: var(--font-display); font-size: 22px; margin-bottom: 8px; }
+.gate-text { font-size: 14px; color: #bbb; margin-bottom: 18px; }
+.gate-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.gate-btns a { padding: 11px 22px; border-radius: var(--radius); font-size: 14px; font-weight: 600; text-decoration: none; }
+.gate-btns a.primary { background: #fff; color: var(--ink); }
+.gate-btns a.ghost { background: transparent; color: #fff; border: 1px solid #555; }
+
+@media (max-width: 600px) {
+  .hero-title { font-size: 28px; }
+  .search-box { flex-direction: column; }
+  .stats { gap: 24px; }
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">Trade<span class="accent">Flow</span><sup>SV</sup></div>
+  <div class="top-actions">
+    <a href="index.html?login=1">Iniciar sesión</a>
+    <a href="index.html?registro=1" class="cta">Crear cuenta gratis</a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-kicker">Consulta pública · Base de datos FDA</div>
+  <h1 class="hero-title">Consulte rechazos de la FDA<br>para exportadores de El Salvador</h1>
+  <p class="hero-sub">Busque por empresa, producto, cargo de refusal o número de embarque. Datos reales de la FDA, sin necesidad de registrarse.</p>
+  <div class="search-box">
+    <input id="q" placeholder="Ej: Diana, camarón, SALMONELLA, 8Q4-..." onkeydown="if(event.key==='Enter')buscar()">
+    <button onclick="buscar()">Buscar</button>
+  </div>
+  <div class="search-hint">Pruebe buscar el nombre de una empresa o un tipo de producto</div>
+  <div class="stats" id="stats"></div>
+</div>
+
+<div class="results" id="results"></div>
+
+<script>
+var API_BASE = '/api';
+var searchCount = 0;
+
+async function cargarStats() {
+  try {
+    var r = await fetch(API_BASE + '/fda/public-stats');
+    var d = await r.json();
+    if (d.ok) {
+      document.getElementById('stats').innerHTML =
+        '<div><div class="stat-num">' + d.totalRefusals.toLocaleString() + '</div><div class="stat-label">Rechazos FDA</div></div>' +
+        '<div><div class="stat-num">' + d.totalFirms.toLocaleString() + '</div><div class="stat-label">Empresas SV</div></div>' +
+        '<div><div class="stat-num">' + d.totalAlerts.toLocaleString() + '</div><div class="stat-label">Import Alerts</div></div>';
+    }
+  } catch (e) {}
+}
+
+function tag(t) {
+  var danger = /LISTERIA|SALMONELLA|FILTHY|INSANITARY|PESTICIDE|AFLATOXIN|POISON/.test(t);
+  return '<span class="tag ' + (danger ? 'red' : 'red') + '">' + t + '</span>';
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  try { return new Date(d).toLocaleDateString('es-SV', {day:'numeric',month:'short',year:'numeric'}); }
+  catch (e) { return d; }
+}
+
+async function buscar() {
+  var q = document.getElementById('q').value.trim();
+  if (q.length < 2) return;
+  var res = document.getElementById('results');
+  res.innerHTML = '<div class="empty"><div class="spinner"></div>Buscando en la base de datos de la FDA...</div>';
+
+  try {
+    var r = await fetch(API_BASE + '/fda/public-search?q=' + encodeURIComponent(q));
+    var d = await r.json();
+    searchCount++;
+
+    if (!d.data || d.data.length === 0) {
+      res.innerHTML = '<div class="empty">No se encontraron rechazos para "<strong>' + q + '</strong>".<br><br>Esto puede ser buena señal — o intente con otro término.</div>' + gateHTML();
+      return;
+    }
+
+    var html = '<div class="results-head"><span>' + d.total + ' resultado(s) para "<strong>' + q + '</strong>"' + (d.total > 25 ? ' (mostrando 25)' : '') + '</span></div>';
+    d.data.forEach(function(x) {
+      var charges = (x.charges || '').split(',').map(function(c){return c.trim();}).filter(Boolean);
+      html += '<div class="result-card">' +
+        '<div class="rc-top"><div class="rc-firm">' + x.firm + (x.city ? ' <span style="font-weight:400;color:#999;font-size:12px">· ' + x.city + '</span>' : '') + '</div>' +
+        '<div class="rc-date">' + fmtDate(x.date) + '</div></div>' +
+        '<div class="rc-product">' + (x.product || x.category || '—') + '</div>' +
+        '<div class="rc-charges">' + charges.map(tag).join('') + '</div>' +
+        (x.shipmentId ? '<div class="rc-meta">Shipment ID: ' + x.shipmentId + '</div>' : '') +
+        '</div>';
+    });
+
+    // Tras 2 búsquedas, mostrar el enganche al registro
+    if (searchCount >= 2) html += gateHTML();
+    res.innerHTML = html;
+  } catch (e) {
+    res.innerHTML = '<div class="empty">Error de conexión. Intente de nuevo.</div>';
+  }
+}
+
+function gateHTML() {
+  return '<div class="gate">' +
+    '<div class="gate-title">¿Quiere monitorear su propia empresa?</div>' +
+    '<div class="gate-text">Cree su cuenta gratis para registrar y rastrear sus envíos, recibir alertas automáticas de la FDA y consultar el estado CBP/ITACS de sus embarques.</div>' +
+    '<div class="gate-btns">' +
+    '<a href="index.html?registro=1" class="primary">Crear cuenta gratis →</a>' +
+    '<a href="index.html?login=1" class="ghost">Ya tengo cuenta</a>' +
+    '</div></div>';
+}
+
+cargarStats();
+</script>
+</body>
+</html>

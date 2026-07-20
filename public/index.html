@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeFlow SV &mdash; Acceder</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f2f2f2;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .left { background: #111; display: flex; flex-direction: column; justify-content: space-between; padding: 48px; }
+    .brand { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 52px; }
+    .brand sup { font-size: 9px; font-weight: 400; color: #888; vertical-align: super; margin-left: 1px; letter-spacing: 1px; }
+    .headline { font-size: 32px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 14px; }
+    .subtext { font-size: 14px; color: #888; line-height: 1.7; max-width: 360px; }
+    .feature-list { margin-top: 44px; border-top: 1px solid #2a2a2a; }
+    .feat { padding: 13px 0; border-bottom: 1px solid #2a2a2a; display: flex; gap: 14px; }
+    .feat-n { font-size: 10px; color: #444; flex-shrink: 0; margin-top: 1px; font-family: 'Courier New', monospace; }
+    .feat-title { font-size: 13px; font-weight: 600; color: #ccc; margin-bottom: 1px; }
+    .feat-desc { font-size: 12px; color: #666; }
+    .stats { display: flex; gap: 1px; }
+    .stat { flex: 1; background: #1a1a1a; border: 1px solid #222; padding: 14px 16px; }
+    .stat:first-child { border-radius: 6px 0 0 6px; }
+    .stat:last-child  { border-radius: 0 6px 6px 0; }
+    .stat-v { font-size: 22px; font-weight: 700; color: #fff; }
+    .stat-l { font-size: 10px; color: #555; margin-top: 3px; }
+
+    .right { display: flex; align-items: center; justify-content: center; padding: 48px; background: #fff; }
+    .box { width: 100%; max-width: 410px; }
+    .tab-row { display: flex; border-bottom: 2px solid #111; margin-bottom: 26px; }
+    .tab-btn { flex: 1; padding: 10px 0; border: none; background: none; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: #999; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .15s; }
+    .tab-btn.active { color: #111; border-bottom-color: #111; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    .demo-box { background: #fafafa; border: 1px solid #e5e5e5; border-left: 4px solid #111; border-radius: 6px; padding: 14px; margin-bottom: 22px; }
+    .demo-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #777; margin-bottom: 8px; }
+    .demo-button { width: 100%; background: #fff; color: #111; border: 1px solid #111; border-radius: 5px; padding: 10px 12px; font-size: 12px; font-weight: 700; letter-spacing: .4px; cursor: pointer; }
+    .demo-button:hover { background: #111; color: #fff; }
+    .demo-help { margin-top: 8px; font-size: 10px; color: #777; line-height: 1.4; font-family: 'Courier New', monospace; }
+    .auth-separator { display: flex; align-items: center; gap: 10px; color: #bbb; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin: 18px 0; }
+    .auth-separator:before, .auth-separator:after { content: ''; flex: 1; height: 1px; background: #eee; }
+
+    .msg { border-radius: 5px; padding: 9px 12px; font-size: 12px; margin-bottom: 12px; display: none; font-family: 'Courier New', monospace; border-left: 3px solid; line-height: 1.45; }
+    .msg.err { background: #fef2f2; border-color: #dc2626; color: #b91c1c; }
+    .msg.ok  { background: #f0fdf4; border-color: #16a34a; color: #15803d; }
+    .msg a { color: inherit; font-weight: 700; word-break: break-all; }
+
+    .form-group { margin-bottom: 13px; }
+    .form-label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #777; margin-bottom: 5px; }
+    .form-input { width: 100%; background: #f7f7f7; border: 1px solid #ddd; border-radius: 5px; padding: 9px 11px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #111; outline: none; transition: border-color .15s; }
+    .form-input:focus { border-color: #111; background: #fff; }
+    .form-input::placeholder { color: #bbb; }
+    .form-input.invalid { border-color: #dc2626; background: #fff7f7; }
+    .form-hint { font-size: 10px; color: #888; margin-top: 4px; font-family: 'Courier New', monospace; line-height: 1.4; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .password-wrap { position: relative; }
+    .password-wrap .form-input { padding-right: 42px; }
+    .password-toggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: none; background: transparent; color: #777; font-size: 13px; cursor: pointer; width: 30px; height: 30px; border-radius: 4px; }
+    .password-toggle:hover { background: #eee; color: #111; }
+    .strength { margin-top: 7px; }
+    .strength-bar { height: 5px; background: #eee; border-radius: 999px; overflow: hidden; }
+    .strength-fill { height: 100%; width: 0%; background: #dc2626; transition: width .15s; }
+    .strength-fill.mid { background: #d97706; }
+    .strength-fill.good { background: #16a34a; }
+    .strength-text { font-size: 10px; color: #777; margin-top: 5px; font-family: 'Courier New', monospace; line-height: 1.35; }
+
+    .role-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .role-opt { border: 1px solid #ddd; border-radius: 5px; padding: 10px 12px; cursor: pointer; transition: all .15s; }
+    .role-opt:hover { border-color: #999; }
+    .role-opt.sel { border-color: #111; background: #f7f7f7; }
+    .role-name { font-size: 12px; font-weight: 700; color: #111; margin-bottom: 1px; }
+    .role-desc { font-size: 11px; color: #999; }
+
+    .btn-submit { width: 100%; background: #111; color: #fff; border: none; padding: 11px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: .5px; cursor: pointer; border-radius: 5px; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 14px; transition: opacity .15s; }
+    .btn-submit:hover { opacity: .85; }
+    .btn-submit:disabled { opacity: .5; pointer-events: none; }
+    .spin { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .foot-link { font-size: 12px; color: #999; text-align: center; line-height: 1.8; }
+    .foot-link a { color: #111; font-weight: 700; text-decoration: none; }
+    .small-title { font-size: 21px; font-weight: 800; margin-bottom: 8px; color: #111; }
+    .small-copy { color: #777; font-size: 13px; line-height: 1.55; margin-bottom: 18px; }
+
+    @media (max-width: 768px) {
+      body { grid-template-columns: 1fr; }
+      .left { display: none; }
+      .right { padding: 32px 20px; align-items: flex-start; padding-top: 48px; }
+      .form-row-2 { grid-template-columns: 1fr; gap: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="left">
+  <div>
+    <div class="brand">TradeFlow<sup>SV</sup></div>
+    <div class="headline">Inteligencia de<br>importaciones<br>en una pantalla.</div>
+    <div class="subtext">Busque empresas, productos, cargos FDA y Shipment IDs de El Salvador antes de crear una cuenta.</div>
+    <div class="feature-list">
+      <div class="feat"><div class="feat-n">01</div><div><div class="feat-title">Consulta rápida FDA</div><div class="feat-desc">Invitado sin empresa ficticia ni datos sesgados.</div></div></div>
+      <div class="feat"><div class="feat-n">02</div><div><div class="feat-title">FDA OASIS / ITACS</div><div class="feat-desc">Historial, rechazos y cargos de refusal.</div></div></div>
+      <div class="feat"><div class="feat-n">03</div><div><div class="feat-title">Validaciones de seguridad</div><div class="feat-desc">Contraseñas fuertes, recuperación y protección contra intentos.</div></div></div>
+      <div class="feat"><div class="feat-n">04</div><div><div class="feat-title">Datos FDA actualizados</div><div class="feat-desc">Consulta diaria de información pública FDA para El Salvador.</div></div></div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-v">FDA</div><div class="stat-l">Dashboard oficial</div></div>
+    <div class="stat"><div class="stat-v">24h</div><div class="stat-l">Actualización automática</div></div>
+    <div class="stat"><div class="stat-v">SV</div><div class="stat-l">Filtro El Salvador</div></div>
+  </div>
+</div>
+
+<div class="right">
+  <div class="box">
+    <div class="tab-row">
+      <button class="tab-btn active" data-tab-btn="login" onclick="showTab('login')">Iniciar sesión</button>
+      <button class="tab-btn" data-tab-btn="register" onclick="showTab('register')">Crear cuenta</button>
+    </div>
+
+    <div class="msg" id="msg-box"><span id="msg-text"></span></div>
+
+    <div class="tab-pane active" id="tab-login">
+      <div class="demo-box">
+        <div class="demo-label">Invitado</div>
+        <button type="button" class="demo-button" onclick="loginDemo()">Explorar como invitado</button>
+        <div class="demo-help">Consulta rápida sin registrar empresa. No usa contraseña demo débil ni guarda credenciales en el navegador.</div>
+      </div>
+      <div class="auth-separator">o iniciar sesión</div>
+
+      <form onsubmit="doLogin(event)" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="l-email">Correo electrónico</label>
+          <input type="email" class="form-input" id="l-email" placeholder="empresa@correo.com" autocomplete="username" required maxlength="254">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="l-pass">Contraseña</label>
+          <div class="password-wrap">
+            <input type="password" class="form-input" id="l-pass" placeholder="Tu contraseña" autocomplete="current-password" required maxlength="128">
+            <button type="button" class="password-toggle" onclick="togglePassword('l-pass', this)" aria-label="Mostrar contraseña">👁</button>
+          </div>
+        </div>
+        <button class="btn-submit" id="btn-login" type="submit"><div class="spin" id="sp-login"></div><span id="txt-login">Entrar</span></button>
+      </form>
+      <div class="foot-link">
+        <a href="#" onclick="showTab('forgot')">¿Olvidó su contraseña?</a><br>
+        Sin cuenta? <a href="#" onclick="showTab('register')">Regístrese aquí</a>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab-register">
+      <div style="margin-bottom:16px">
+        <div class="form-label" style="margin-bottom:8px">Tipo de cuenta</div>
+        <div class="role-row">
+          <div class="role-opt sel" onclick="selRole(this,'importer')"><div class="role-name">Importador</div><div class="role-desc">Empresa exportadora SV</div></div>
+          <div class="role-opt" onclick="selRole(this,'broker')"><div class="role-name">Broker Aduanal</div><div class="role-desc">Agente de aduanas</div></div>
+        </div>
+      </div>
+      <form onsubmit="doRegister(event)" novalidate>
+        <div class="form-row-2">
+          <div class="form-group"><label class="form-label" for="r-name">Nombre</label><input type="text" class="form-input" id="r-name" placeholder="Carlos Mendoza" required maxlength="90" autocomplete="name"></div>
+          <div class="form-group"><label class="form-label" for="r-company">Empresa</label><input type="text" class="form-input" id="r-company" placeholder="Mi Empresa S.A." required maxlength="140" autocomplete="organization"></div>
+        </div>
+        <div class="form-group"><label class="form-label" for="r-email">Correo electrónico</label><input type="email" class="form-input" id="r-email" placeholder="tu@empresa.com" required maxlength="254" autocomplete="username"></div>
+        <div class="form-group"><label class="form-label" for="r-ior">Número IOR (opcional)</label><input type="text" class="form-input" id="r-ior" placeholder="SV-2024-00000" maxlength="40"><div class="form-hint">Importer of Record asignado por CBP.</div></div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="r-pass">Contraseña</label>
+            <div class="password-wrap"><input type="password" class="form-input" id="r-pass" placeholder="Mínimo 10 caracteres" required autocomplete="new-password" maxlength="128" oninput="updateStrength('r-pass','r-strength')"><button type="button" class="password-toggle" onclick="togglePassword('r-pass', this)" aria-label="Mostrar contraseña">👁</button></div>
+            <div class="strength" id="r-strength"><div class="strength-bar"><div class="strength-fill"></div></div><div class="strength-text">Use mayúscula, minúscula, número y símbolo.</div></div>
+          </div>
+          <div class="form-group"><label class="form-label" for="r-pass2">Confirmar</label><div class="password-wrap"><input type="password" class="form-input" id="r-pass2" placeholder="Repetir" required autocomplete="new-password" maxlength="128"><button type="button" class="password-toggle" onclick="togglePassword('r-pass2', this)" aria-label="Mostrar contraseña">👁</button></div></div>
+        </div>
+        <button class="btn-submit" id="btn-reg" type="submit"><div class="spin" id="sp-reg"></div><span id="txt-reg">Crear cuenta</span></button>
+      </form>
+      <div class="foot-link">Ya tiene cuenta? <a href="#" onclick="showTab('login')">Iniciar sesión</a></div>
+    </div>
+
+    <div class="tab-pane" id="tab-forgot">
+      <div class="small-title">Recuperar contraseña</div>
+      <div class="small-copy">Ingrese el correo de la cuenta. Si existe, enviaremos un enlace temporal. Revise también Spam o Promociones.</div>
+      <form onsubmit="doForgot(event)" novalidate>
+        <div class="form-group"><label class="form-label" for="f-email">Correo electrónico</label><input type="email" class="form-input" id="f-email" placeholder="empresa@correo.com" required autocomplete="username" maxlength="254"></div>
+        <button class="btn-submit" id="btn-forgot" type="submit"><div class="spin" id="sp-forgot"></div><span id="txt-forgot">Enviar instrucciones</span></button>
+      </form>
+      <div class="foot-link"><a href="#" onclick="showTab('login')">Volver a iniciar sesión</a></div>
+    </div>
+
+    <div class="tab-pane" id="tab-reset">
+      <div class="small-title">Crear nueva contraseña</div>
+      <div class="small-copy">La nueva contraseña debe ser fuerte para evitar advertencias del navegador y accesos no autorizados.</div>
+      <form onsubmit="doReset(event)" novalidate>
+        <input type="hidden" id="reset-token">
+        <div class="form-group">
+          <label class="form-label" for="x-pass">Nueva contraseña</label>
+          <div class="password-wrap"><input type="password" class="form-input" id="x-pass" placeholder="Mínimo 10 caracteres" required autocomplete="new-password" maxlength="128" oninput="updateStrength('x-pass','x-strength')"><button type="button" class="password-toggle" onclick="togglePassword('x-pass', this)" aria-label="Mostrar contraseña">👁</button></div>
+          <div class="strength" id="x-strength"><div class="strength-bar"><div class="strength-fill"></div></div><div class="strength-text">Use mayúscula, minúscula, número y símbolo.</div></div>
+        </div>
+        <div class="form-group"><label class="form-label" for="x-pass2">Confirmar contraseña</label><div class="password-wrap"><input type="password" class="form-input" id="x-pass2" placeholder="Repetir" required autocomplete="new-password" maxlength="128"><button type="button" class="password-toggle" onclick="togglePassword('x-pass2', this)" aria-label="Mostrar contraseña">👁</button></div></div>
+        <button class="btn-submit" id="btn-reset" type="submit"><div class="spin" id="sp-reset"></div><span id="txt-reset">Actualizar contraseña</span></button>
+      </form>
+      <div class="foot-link"><a href="#" onclick="showTab('login')">Volver a iniciar sesión</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var API_BASE = '/api';
+function request(method, endpoint, body) {
+  return fetch(API_BASE + endpoint, {
+    method: method,
+    cache: 'no-store',
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
+    body: body ? JSON.stringify(body) : undefined
+  }).then(function(r){ return r.json().catch(function(){ return { ok:false, msg:'Respuesta inválida del servidor' }; }); });
+}
+var API = {
+  login: function(b) { return request('POST', '/auth/login', b); },
+  guest: function() { return request('POST', '/auth/guest', {}); },
+  register: function(b) { return request('POST', '/auth/register', b); },
+  forgot: function(b) { return request('POST', '/auth/forgot-password', b); },
+  reset: function(b) { return request('POST', '/auth/reset-password', b); }
+};
+</script>
+<script>
+  function requestedAuthFlow() {
+    var params = new URLSearchParams(window.location.search || '');
+    var requested = String(params.get('tab') || (window.location.hash || '').replace('#', '')).toLowerCase();
+    return params.get('auth') === '1'
+      || requested === 'reset'
+      || requested === 'forgot'
+      || requested === 'login'
+      || requested === 'register'
+      || !!params.get('token');
+  }
+
+  // No redirigir al dashboard si el usuario abrió un enlace de recuperación.
+  // Antes, si había token demo/usuario en localStorage, /index.html?tab=reset&token=...
+  // mandaba de regreso a TradeFlow-Demo.html antes de mostrar el formulario de reset.
+  if (localStorage.getItem('tf_token') && !requestedAuthFlow()) {
+    window.location.href = 'TradeFlow-Demo.html';
+  }
+
+  var selectedRole = 'importer';
+  var COMMON = ['123456','12345678','123456789','1234567890','password','password1','qwerty','qwerty123','admin123','tradeflow','tradeflow123','empresa123','abc123'];
+
+  function normalizeEmail(v) { return String(v || '').trim().toLowerCase(); }
+  function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(normalizeEmail(v)); }
+
+  function passwordIssues(pass) {
+    var p = String(pass || '');
+    var low = p.toLowerCase();
+    var issues = [];
+    if (p.length < 10) issues.push('mínimo 10 caracteres');
+    if (!/[a-z]/.test(p)) issues.push('una minúscula');
+    if (!/[A-Z]/.test(p)) issues.push('una mayúscula');
+    if (!/[0-9]/.test(p)) issues.push('un número');
+    if (!/[^A-Za-z0-9]/.test(p)) issues.push('un símbolo');
+    if (COMMON.indexOf(low) >= 0) issues.push('no usar contraseñas comunes');
+    if (/12345|23456|34567|45678|56789|abcde|qwert/i.test(p)) issues.push('no usar secuencias');
+    if (/(.)\1{3,}/.test(p)) issues.push('no repetir caracteres');
+    return issues;
+  }
+
+  function updateStrength(inputId, wrapId) {
+    var input = document.getElementById(inputId);
+    var wrap = document.getElementById(wrapId);
+    if (!input || !wrap) return true;
+    var issues = passwordIssues(input.value);
+    var classes = [/[a-z]/, /[A-Z]/, /[0-9]/, /[^A-Za-z0-9]/].filter(function(re){ return re.test(input.value); }).length;
+    var score = Math.max(0, Math.min(100, input.value.length * 5 + classes * 12 - issues.length * 12));
+    var fill = wrap.querySelector('.strength-fill');
+    var text = wrap.querySelector('.strength-text');
+    fill.style.width = score + '%';
+    fill.className = 'strength-fill' + (score >= 75 && !issues.length ? ' good' : score >= 45 ? ' mid' : '');
+    if (!input.value) text.textContent = 'Use mayúscula, minúscula, número y símbolo.';
+    else if (issues.length) text.textContent = 'Falta: ' + issues.slice(0, 4).join(', ') + (issues.length > 4 ? '...' : '');
+    else text.textContent = 'Contraseña fuerte.';
+    input.classList.toggle('invalid', !!input.value && issues.length > 0);
+    return issues.length === 0;
+  }
+
+  function togglePassword(inputId, btn) {
+    var input = document.getElementById(inputId);
+    if (!input) return;
+    input.type = input.type === 'password' ? 'text' : 'password';
+    btn.textContent = input.type === 'password' ? '👁' : '✕';
+  }
+
+  function showTab(tab) {
+    document.querySelectorAll('.tab-pane').forEach(function(p) { p.classList.remove('active'); });
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    var pane = document.getElementById('tab-' + tab);
+    if (!pane) pane = document.getElementById('tab-login');
+    pane.classList.add('active');
+    var btn = document.querySelector('[data-tab-btn="' + tab + '"]');
+    if (btn) btn.classList.add('active');
+    showMsg('', '');
+  }
+
+  function showMsg(type, text) {
+    var box = document.getElementById('msg-box');
+    if (!text) { box.style.display = 'none'; return; }
+    box.className = 'msg ' + type;
+    document.getElementById('msg-text').innerHTML = text;
+    box.style.display = 'block';
+  }
+
+  function setLoading(btnId, spId, txtId, loading, txt) {
+    document.getElementById(btnId).disabled = loading;
+    document.getElementById(spId).style.display = loading ? 'block' : 'none';
+    document.getElementById(txtId).textContent = txt;
+  }
+
+  async function loginDemo() {
+    showMsg('', '');
+    var btn = document.querySelector('.demo-button');
+    if (btn) { btn.disabled = true; btn.textContent = 'Cargando consulta rápida...'; }
+    const data = await API.guest();
+    if (!data.ok) {
+      showMsg('err', data.msg || 'No se pudo abrir la consulta invitado.');
+      if (btn) { btn.disabled = false; btn.textContent = 'Explorar como invitado'; }
+      return;
+    }
+    localStorage.setItem('tf_demo_mode', '1');
+    localStorage.setItem('tf_token', data.token);
+    localStorage.setItem('tf_user', JSON.stringify(data.user));
+    window.location.href = 'TradeFlow-Demo.html';
+  }
+
+  function selRole(el, role) {
+    selectedRole = role;
+    document.querySelectorAll('.role-opt').forEach(function(o) { o.classList.remove('sel'); });
+    el.classList.add('sel');
+  }
+
+  async function doLogin(e) {
+    e.preventDefault();
+    showMsg('', '');
+    const email = normalizeEmail(document.getElementById('l-email').value);
+    const pass = document.getElementById('l-pass').value;
+    if (!validEmail(email)) { showMsg('err', 'Ingrese un correo electrónico válido.'); return; }
+    if (!pass) { showMsg('err', 'Ingrese la contraseña.'); return; }
+    setLoading('btn-login', 'sp-login', 'txt-login', true, 'Conectando...');
+    const data = await API.login({ email: email, password: pass });
+    if (!data.ok) {
+      showMsg('err', data.msg || 'Correo o contraseña incorrectos.');
+      setLoading('btn-login', 'sp-login', 'txt-login', false, 'Entrar');
+      return;
+    }
+    localStorage.removeItem('tf_demo_mode');
+    localStorage.setItem('tf_token', data.token);
+    localStorage.setItem('tf_user', JSON.stringify(data.user));
+    setLoading('btn-login', 'sp-login', 'txt-login', true, 'Cargando dashboard...');
+    setTimeout(function() { window.location.href = 'TradeFlow-Demo.html'; }, 400);
+  }
+
+  async function doRegister(e) {
+    e.preventDefault();
+    const pass  = document.getElementById('r-pass').value;
+    const pass2 = document.getElementById('r-pass2').value;
+    if (!document.getElementById('r-name').value.trim()) { showMsg('err', 'Ingrese el nombre.'); return; }
+    if (!document.getElementById('r-company').value.trim()) { showMsg('err', 'Ingrese la empresa.'); return; }
+    if (!validEmail(document.getElementById('r-email').value)) { showMsg('err', 'Ingrese un correo electrónico válido.'); return; }
+    if (pass !== pass2) { showMsg('err', 'Las contraseñas no coinciden.'); return; }
+    if (!updateStrength('r-pass','r-strength')) { showMsg('err', 'La contraseña es débil. Use mínimo 10 caracteres, mayúscula, minúscula, número y símbolo.'); return; }
+    showMsg('', '');
+    setLoading('btn-reg', 'sp-reg', 'txt-reg', true, 'Creando cuenta...');
+    const data = await API.register({
+      name:       document.getElementById('r-name').value.trim(),
+      email:      normalizeEmail(document.getElementById('r-email').value),
+      password:   pass,
+      company:    document.getElementById('r-company').value.trim(),
+      ior_number: document.getElementById('r-ior').value.trim(),
+      role:       selectedRole
+    });
+    if (!data.ok) {
+      showMsg('err', data.msg || 'Error al crear la cuenta.');
+      setLoading('btn-reg', 'sp-reg', 'txt-reg', false, 'Crear cuenta');
+      return;
+    }
+    localStorage.removeItem('tf_demo_mode');
+    localStorage.setItem('tf_token', data.token);
+    localStorage.setItem('tf_user', JSON.stringify(data.user));
+    showMsg('ok', 'Cuenta creada. Redirigiendo...');
+    setTimeout(function() { window.location.href = 'TradeFlow-Demo.html'; }, 600);
+  }
+
+  async function doForgot(e) {
+    e.preventDefault();
+    const email = normalizeEmail(document.getElementById('f-email').value);
+    if (!validEmail(email)) { showMsg('err', 'Ingrese un correo electrónico válido.'); return; }
+    setLoading('btn-forgot', 'sp-forgot', 'txt-forgot', true, 'Generando enlace...');
+    const data = await API.forgot({ email: email, reset_base_url: window.location.origin });
+    setLoading('btn-forgot', 'sp-forgot', 'txt-forgot', false, 'Enviar instrucciones');
+    var msg = data.msg || 'Si el correo existe, enviaremos instrucciones para recuperar la contraseña. Revise Spam o Promociones si no aparece en unos minutos.';
+    if (data.dev_reset_url) msg += '<br><br><strong>Modo local:</strong> <a href="' + data.dev_reset_url + '">abrir enlace de recuperación</a>';
+    showMsg('ok', msg);
+  }
+
+  async function doReset(e) {
+    e.preventDefault();
+    const token = document.getElementById('reset-token').value;
+    const pass = document.getElementById('x-pass').value;
+    const pass2 = document.getElementById('x-pass2').value;
+    if (pass !== pass2) { showMsg('err', 'Las contraseñas no coinciden.'); return; }
+    if (!updateStrength('x-pass','x-strength')) { showMsg('err', 'La contraseña es débil. Use mínimo 10 caracteres, mayúscula, minúscula, número y símbolo.'); return; }
+    setLoading('btn-reset', 'sp-reset', 'txt-reset', true, 'Actualizando...');
+    const data = await API.reset({ token: token, password: pass });
+    setLoading('btn-reset', 'sp-reset', 'txt-reset', false, 'Actualizar contraseña');
+    if (!data.ok) { showMsg('err', data.msg || 'No se pudo actualizar la contraseña.'); return; }
+    localStorage.removeItem('tf_token');
+    localStorage.removeItem('tf_user');
+    localStorage.removeItem('tf_demo_mode');
+    showMsg('ok', data.msg || 'Contraseña actualizada. Ya puede iniciar sesión.');
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState({}, document.title, 'index.html?tab=login');
+    }
+    setTimeout(function(){ showTab('login'); }, 1000);
+  }
+
+  (function initRequestedTab() {
+    var params = new URLSearchParams(window.location.search || '');
+    var requested = String(params.get('tab') || (window.location.hash || '').replace('#', '')).toLowerCase();
+    var token = params.get('token') || '';
+    if (requested === 'reset' || token) {
+      // El enlace de recuperación debe funcionar aunque el navegador tenga una sesión demo
+      // o una sesión real guardada. Limpiamos sesión local solo para este flujo.
+      localStorage.removeItem('tf_token');
+      localStorage.removeItem('tf_user');
+      localStorage.removeItem('tf_demo_mode');
+      document.getElementById('reset-token').value = token;
+      showTab('reset');
+      if (!token) showMsg('err', 'El enlace de recuperación no trae token. Solicite uno nuevo.');
+      return;
+    }
+    if (requested === 'register' || requested === 'login' || requested === 'forgot') {
+      showTab(requested);
+      return;
+    }
+    if (params.get('demo') === '0' || params.get('auth') === '1') return;
+    window.setTimeout(function() { loginDemo(); }, 150);
+  })();
+</script>
+</body>
+</html>
